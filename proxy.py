@@ -13,7 +13,7 @@ habr = habra_protocol + habra_host
 
 def modify_page(page):
     bs = BeautifulSoup(page, 'html.parser')
-    comments = bs.find_all(string=lambda text:isinstance(text, Comment))
+    comments = bs.find_all(string=lambda text: isinstance(text, Comment))
     for c in comments:
         c.extract()
     for a_html in bs.findAll('a'):
@@ -23,7 +23,6 @@ def modify_page(page):
         except KeyError:
             pass
     return bs.prettify(formatter=None)
-
 
 
 def add_tm_str(page):
