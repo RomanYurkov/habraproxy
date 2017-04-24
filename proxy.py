@@ -4,22 +4,26 @@ import re
 from urllib.parse import urljoin
 import aiohttp
 from aiohttp import web
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Comment
 
 habra_protocol = 'https://'
 habra_host = 'habrahabr.ru'
 habr = habra_protocol + habra_host
 
 
-def replace_links(page):
+def modify_page(page):
     bs = BeautifulSoup(page, 'html.parser')
+    comments = bs.find_all(string=lambda text:isinstance(text, Comment))
+    for c in comments:
+        c.extract()
     for a_html in bs.findAll('a'):
         try:
             a_html['href'] = a_html['href'].replace(
                 habr, 'http://localhost:8077')
         except KeyError:
             pass
-    return bs.prettify(bs.original_encoding)
+    return bs.prettify(formatter=None)
+
 
 
 def add_tm_str(page):
@@ -30,7 +34,7 @@ def add_tm_str(page):
                         tm_element, i, flags=re.UNICODE)
         if add_tm != i:
             i.replaceWith(add_tm)
-    tm_html = bs.prettify(bs.original_encoding)
+    tm_html = bs.prettify(formatter=None)
     return tm_html
 
 
@@ -64,8 +68,8 @@ async def habra_proxy(request):
                 break
             if change_str:
                 modify_chunk = chunk.decode(response.charset)
+                modify_chunk = modify_page(modify_chunk)
                 modify_chunk = add_tm_str(modify_chunk)
-                modify_chunk = replace_links(modify_chunk)
                 chunk = bytes(modify_chunk, response.charset)
             proxy_response.write(chunk)
             await proxy_response.drain()
