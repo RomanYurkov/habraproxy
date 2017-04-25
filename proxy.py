@@ -11,6 +11,11 @@ habra_host = 'habrahabr.ru'
 habr = habra_protocol + habra_host
 
 
+def visible_element(element):
+    if element.parent.name in ['script', 'title', '[document]', 'style', 'head'] or element == '\n':
+        return False
+    return True
+
 def modify_page(page):
     bs = BeautifulSoup(page, 'html.parser')
     comments = bs.find_all(string=lambda text: isinstance(text, Comment))
@@ -28,11 +33,12 @@ def modify_page(page):
 def add_tm_str(page):
     bs = BeautifulSoup(page, 'html.parser')
     for i in bs.findAll(text=True):
-        tm_element = r"\1{0}".format(u"\u2122")
-        add_tm = re.sub(r"(?<!-)\b(\w{6})\b(?!-)",
-                        tm_element, i, flags=re.UNICODE)
-        if add_tm != i:
-            i.replaceWith(add_tm)
+        if visible_element(i):
+            tm_element = r"\1{0}".format(u"\u2122")
+            add_tm = re.sub(r"(?<!-)\b(\w{6})\b(?!-)",
+                            tm_element, i, flags=re.UNICODE)
+            if add_tm != i:
+                i.replaceWith(add_tm)
     tm_html = bs.prettify(formatter=None)
     return tm_html
 
