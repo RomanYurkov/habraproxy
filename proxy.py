@@ -6,6 +6,7 @@ import aiohttp
 from aiohttp import web
 from bs4 import BeautifulSoup, Comment
 import html5lib
+import lxml
 
 habra_protocol = 'https://'
 habra_host = 'habrahabr.ru'
@@ -29,7 +30,7 @@ def modify_page(page):
                 habr, 'http://localhost:8077')
         except KeyError:
             pass
-    return bs.prettify(bs.original_encoding)
+    return bs.decode()
 
 
 def add_tm_str(page):
@@ -41,8 +42,7 @@ def add_tm_str(page):
                             tm_element, i, flags=re.UNICODE)
             if add_tm != i:
                 i.replaceWith(add_tm)
-    tm_html = bs.prettify(bs.original_encoding)
-    return tm_html
+    return bs.decode()
 
 
 async def habra_proxy(request):
