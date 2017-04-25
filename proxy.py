@@ -6,7 +6,6 @@ import aiohttp
 from aiohttp import web
 from bs4 import BeautifulSoup, Comment
 import html5lib
-import lxml
 
 habra_protocol = 'https://'
 habra_host = 'habrahabr.ru'
