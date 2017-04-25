@@ -5,6 +5,7 @@ from urllib.parse import urljoin
 import aiohttp
 from aiohttp import web
 from bs4 import BeautifulSoup, Comment
+import html5lib
 
 habra_protocol = 'https://'
 habra_host = 'habrahabr.ru'
@@ -16,8 +17,9 @@ def visible_element(element):
         return False
     return True
 
+
 def modify_page(page):
-    bs = BeautifulSoup(page, 'html.parser')
+    bs = BeautifulSoup(page, 'html5lib')
     comments = bs.find_all(string=lambda text: isinstance(text, Comment))
     for c in comments:
         c.extract()
@@ -27,11 +29,11 @@ def modify_page(page):
                 habr, 'http://localhost:8077')
         except KeyError:
             pass
-    return bs.prettify(formatter=None)
+    return bs.prettify(bs.original_encoding)
 
 
 def add_tm_str(page):
-    bs = BeautifulSoup(page, 'html.parser')
+    bs = BeautifulSoup(page, 'html5lib')
     for i in bs.findAll(text=True):
         if visible_element(i):
             tm_element = r"\1{0}".format(u"\u2122")
@@ -39,7 +41,7 @@ def add_tm_str(page):
                             tm_element, i, flags=re.UNICODE)
             if add_tm != i:
                 i.replaceWith(add_tm)
-    tm_html = bs.prettify(formatter=None)
+    tm_html = bs.prettify(bs.original_encoding)
     return tm_html
 
 
