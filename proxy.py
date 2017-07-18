@@ -32,7 +32,7 @@ def modify_page(page):
     return bs.decode()
 
 
-def add_tm_str(page):
+def add_tm_string(page):
     bs = BeautifulSoup(page, 'html5lib')
     for i in bs.findAll(text=True):
         if visible_element(i):
@@ -75,7 +75,7 @@ async def habra_proxy(request):
             if change_str:
                 modify_chunk = chunk.decode(response.charset)
                 modify_chunk = modify_page(modify_chunk)
-                modify_chunk = add_tm_str(modify_chunk)
+                modify_chunk = add_tm_string(modify_chunk)
                 chunk = bytes(modify_chunk, response.charset)
             proxy_response.write(chunk)
             await proxy_response.drain()
